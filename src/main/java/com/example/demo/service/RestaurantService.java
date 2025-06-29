@@ -103,4 +103,11 @@ public class RestaurantService {
                 .orElse(null);
     }
 
+    public Restaurant selectRestaurantByHighestRating(List<Restaurant> restaurants, List<OrderItem> items) {
+        return restaurants.stream()
+                .filter(r -> canAcceptOrder(r) && canFulfillOrder(r, items))
+                .max(Comparator.comparingDouble(Restaurant::getRating))
+                .orElse(null);
+    }
+
 }

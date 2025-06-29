@@ -28,12 +28,14 @@ public class OrderService {
         Restaurant restaurant;
         if ("lowest_cost".equalsIgnoreCase(strategy)) {
             restaurant = restaurantService.selectRestaurantByLowestCost(restaurantRepository.findAll(), items);
-        } else {
-            return "Cannot assign the order, only lowest cost is available right now";
+        } else if("highest_rating".equalsIgnoreCase(strategy)){
+            restaurant = restaurantService.selectRestaurantByHighestRating(restaurantRepository.findAll(), items);
+        }else{
+            return "Cannot assign the order, choose correct strategy";
         }
 
         if (restaurant == null) {
-            return "Cannot assign the order";
+            return "no restaurant can take the order";
         }
 
         Order order = new Order(user, items);
