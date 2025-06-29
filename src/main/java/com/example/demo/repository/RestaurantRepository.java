@@ -1,25 +1,8 @@
 package com.example.demo.repository;
 
 import com.example.demo.model.Restaurant;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.util.ArrayList;
-import java.util.List;
+public interface RestaurantRepository extends MongoRepository<Restaurant,String> {
 
-@Repository
-public class RestaurantRepository {
-    private final List<Restaurant> restaurants = new ArrayList<>();
-
-    public void save(Restaurant restaurant) {
-        restaurants.removeIf(r -> r.getName().equalsIgnoreCase(restaurant.getName()));
-        restaurants.add(restaurant);
-    }
-
-    public Restaurant findByName(String name) {
-        return restaurants.stream().filter(r -> r.getName().equalsIgnoreCase(name)).findAny().orElse(null);
-    }
-
-    public List<Restaurant> findAll() {
-        return restaurants;
-    }
 }

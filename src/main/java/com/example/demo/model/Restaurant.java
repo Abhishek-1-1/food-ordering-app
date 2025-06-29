@@ -2,18 +2,22 @@ package com.example.demo.model;
 
 import com.example.demo.pojo.MenuItem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Document(collection = "resturants")
 public class Restaurant {
+    @Id
     private String name;
     private Double rating;
     private Integer maxOrders;
     private List<MenuItem> menu = new ArrayList<>();
 
-    @JsonIgnore
-    private List<Order> currentOrders = new ArrayList<>();
+//    @JsonIgnore
+    private List<Integer> currentOrders = new ArrayList<>();
 
     public Restaurant() {}
 
@@ -43,11 +47,11 @@ public class Restaurant {
         this.menu = menu;
     }
 
-    public List<Order> getCurrentOrders() {
+    public List<Integer> getCurrentOrders() {
         return currentOrders;
     }
 
-    public void setCurrentOrders(List<Order> currentOrders) {
+    public void setCurrentOrders(List<Integer> currentOrders) {
         this.currentOrders = currentOrders;
     }
 }

@@ -9,11 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrderService {
-    private  OrderRepository orderRepository;
-    private  RestaurantRepository restaurantRepository;
+    private OrderRepository orderRepository;
+    private RestaurantRepository restaurantRepository;
     private RestaurantService restaurantService;
 
     @Autowired
@@ -36,7 +37,7 @@ public class OrderService {
         }
 
         Order order = new Order(user, items);
-        order.setRestaurant(restaurant);
+        order.setRestaurantName(restaurant.getName());
         restaurantService.addOrderToRestaurant(restaurant, order);
         orderRepository.save(order);
         return "Order " + order.getId() + " assigned to " + restaurant.getName();
@@ -44,10 +45,11 @@ public class OrderService {
 
 
     public String completeOrder(Integer orderId) {
-        Order order = orderRepository.findById(orderId);
-        if (order != null && "ACCEPTED".equals(order.getStatus())) {
-            order.setStatus("COMPLETED");
-            restaurantService.removeOrderFromRestaurant(order.getRestaurant(), order);
+        Optional<Order> order = orderRepository.findById(orderId);
+        if (order.isPresent() && "ACCEPTED".equals(order.get().getStatus())) {
+            order.get().setStatus("COMPLETED");
+            orderRepository.save(order.get());
+            restaurantService.removeOrderFromRestaurant(order.get().getRestaurantName(), order.orElse(null));
             return "Order " + orderId + " marked as COMPLETED";
         } else {
             return "Invalid Order ID or already completed";
@@ -55,6 +57,6 @@ public class OrderService {
     }
 
     public List<Order> getAll() {
-        return orderRepository.getAll();
+        return orderRepository.findAll();
     }
 }

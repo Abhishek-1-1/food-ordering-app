@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RestaurantService {
@@ -26,9 +27,9 @@ public class RestaurantService {
     }
 
     public void updateMenu(String name, List<MenuItem> newItems) {
-        Restaurant restaurant = restaurantRepository.findByName(name);
-        if (restaurant != null) {
-            List<MenuItem> currentMenu = restaurant.getMenu();
+        Optional<Restaurant> restaurant = restaurantRepository.findById(name);
+        if (restaurant.isPresent()) {
+            List<MenuItem> currentMenu = restaurant.get().getMenu();
             for (MenuItem newItem : newItems) {
                 boolean found = false;
                 for (MenuItem item : currentMenu) {
@@ -40,7 +41,9 @@ public class RestaurantService {
                 }
                 if (!found) currentMenu.add(newItem);
             }
+            restaurantRepository.save(restaurant.get());
         }
+
     }
 
     public List<Restaurant> getAll() {
@@ -74,16 +77,22 @@ public class RestaurantService {
 
     public void addOrderToRestaurant(Restaurant restaurant, Order order) {
         // adds order to the selected restaurant
-        List<Order> current = new ArrayList<>(restaurant.getCurrentOrders());
-        current.add(order);
+        List<Integer> current = new ArrayList<>(restaurant.getCurrentOrders());
+        current.add(order.getId());
         restaurant.setCurrentOrders(current);
+        restaurantRepository.save(restaurant);
     }
 
-    public void removeOrderFromRestaurant(Restaurant restaurant, Order order) {
+    public void removeOrderFromRestaurant(String restaurantName, Order order) {
         // needed for removal of completed order from restaurant current list, so that new order can be added
-        List<Order> current = new ArrayList<>(restaurant.getCurrentOrders());
-        current.removeIf(o -> o.getId().equals(order.getId()));
+        Restaurant restaurant=restaurantRepository.findById(restaurantName).orElse(null);
+//        System.out.println(restaurant.getCurrentOrders());
+//        System.out.println(restaurant.getMaxOrders());
+//        System.out.println(restaurant.getName());
+        List<Integer> current = new ArrayList<>(restaurant.getCurrentOrders());
+        current.removeIf(o -> o.equals(order.getId()));
         restaurant.setCurrentOrders(current);
+        restaurantRepository.save(restaurant);
     }
 
     public Restaurant selectRestaurantByLowestCost(List<Restaurant> restaurants, List<OrderItem> items) {

@@ -1,15 +1,21 @@
 package com.example.demo.model;
 
 import com.example.demo.pojo.OrderItem;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
+@Document(collection = "orders")
 public class Order {
+//    @Transient
     private static Integer ID_COUNTER = 1;
+    @Id
     private Integer id;
     private String user;
     private List<OrderItem> items;
-    private Restaurant restaurant;
+    private String restaurantName;
     private String status;
 
     public Order() {}
@@ -41,12 +47,12 @@ public class Order {
         this.items = items;
     }
 
-    public Restaurant getRestaurant() {
-        return restaurant;
+    public String getRestaurantName() {
+        return restaurantName;
     }
 
-    public void setRestaurant(Restaurant restaurant) {
-        this.restaurant = restaurant;
+    public void setRestaurantName(String restaurantName) {
+        this.restaurantName = restaurantName;
     }
 
     public void setStatus(String status) {
